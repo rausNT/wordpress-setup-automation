@@ -18,6 +18,12 @@ Run the script directly using the following command:
 bash <(curl -Ls https://raw.githubusercontent.com/rausNT/wordpress-setup-automation/main/wordpress-setup.sh)
 ```
 
+If the script fails to execute as expected or seems to hang, you can run it in debug mode to see detailed output and trace its execution:
+```bash
+bash -x <(curl -Ls https://raw.githubusercontent.com/rausNT/wordpress-setup-automation/main/wordpress-setup.sh)
+```
+This will provide step-by-step output of each command being executed, helping you identify where the issue might be.
+
 ## What the Script Does
 
 Checks your system for compatibility.
