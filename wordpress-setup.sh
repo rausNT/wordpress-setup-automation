@@ -33,6 +33,27 @@ check_sudo() {
     fi
 }
 
+# Function to read input with a default value
+read_input() {
+    local prompt="$1"
+    local default="$2"
+    local input
+
+    echo -n "$prompt"
+    if [[ -n "$default" ]]; then
+        echo -n " [$default]: "
+    else
+        echo -n ": "
+    fi
+
+    read input
+    if [[ -z "$input" && -n "$default" ]]; then
+        input="$default"
+    fi
+
+    echo "$input"
+}
+
 # Prompt for clean installation
 clean_install_prompt() {
     read -p "WARNING: This will erase all existing data on the server. Do you want to proceed with a clean installation? (y/N): " confirm
