@@ -218,24 +218,13 @@ log "WordPress installation completed. Displaying configuration details..."
 
 # Verify website availability
 log "Verifying website availability..."
+WEBSITE_STATUS="not accessible"
 if curl -Is "https://${SITE_DOMAIN}/" | grep -q "200 OK"; then
-    log "Website is live and accessible."
-    echo "==========================================="
-    echo "Your WordPress site is ready at: https://${SITE_DOMAIN}/"
-    echo "Start configuration at: https://${SITE_DOMAIN}/wp-admin/setup-config.php"
-    echo "==========================================="
-else
-    log "Website is not accessible. Please check your setup."
-    echo "==========================================="
-    echo "Recommendations:"
-    echo "1. Ensure the domain ${SITE_DOMAIN} has correct A/AAAA records pointing to your server's IP."
-    echo "2. Verify that Nginx is running and properly configured."
-    echo "3. Check for SSL certificate installation issues in the Certbot logs."
-    echo "4. Confirm that your server's firewall allows HTTP/HTTPS traffic."
-    echo "==========================================="
+    WEBSITE_STATUS="accessible"
 fi
 
-
+# Display final configuration
+log "WordPress installation completed. Displaying configuration details..."
 cat <<EOM
 ===========================================
 WordPress has been successfully installed!
@@ -245,13 +234,23 @@ Database connection details:
   Username: ${DB_USER}
   Password: ${DB_PASSWORD}
 
-Website is accessible at: http://${SITE_DOMAIN}/
+Website status: ${WEBSITE_STATUS}
+  Accessible at: http://${SITE_DOMAIN}/
+  SSL-secured: https://${SITE_DOMAIN}/
+  
+  To complete the WordPress setup, visit:
+  https://${SITE_DOMAIN}/wp-admin/setup-config.php
 
-SSL certificate installed. Accessible via HTTPS: https://${SITE_DOMAIN}/
+If the website is not accessible, ensure the following:
+1. Verify that the domain ${SITE_DOMAIN} has correct A/AAAA records pointing to your server's IP.
+2. Check that Nginx is running and properly configured.
+3. Confirm the SSL certificate installation in Certbot logs.
+4. Check that your server's firewall allows HTTP/HTTPS traffic.
 
 Fail2Ban configured to protect against suspicious requests.
 ClamAV installed for antivirus protection.
 ===========================================
 EOM
+
 
 log "Script execution completed successfully."
