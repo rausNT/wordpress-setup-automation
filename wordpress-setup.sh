@@ -215,6 +215,27 @@ fi
 
 # Display final configuration
 log "WordPress installation completed. Displaying configuration details..."
+
+# Verify website availability
+log "Verifying website availability..."
+if curl -Is "https://${SITE_DOMAIN}/" | grep -q "200 OK"; then
+    log "Website is live and accessible."
+    echo "==========================================="
+    echo "Your WordPress site is ready at: https://${SITE_DOMAIN}/"
+    echo "Start configuration at: https://${SITE_DOMAIN}/wp-admin/setup-config.php"
+    echo "==========================================="
+else
+    log "Website is not accessible. Please check your setup."
+    echo "==========================================="
+    echo "Recommendations:"
+    echo "1. Ensure the domain ${SITE_DOMAIN} has correct A/AAAA records pointing to your server's IP."
+    echo "2. Verify that Nginx is running and properly configured."
+    echo "3. Check for SSL certificate installation issues in the Certbot logs."
+    echo "4. Confirm that your server's firewall allows HTTP/HTTPS traffic."
+    echo "==========================================="
+fi
+
+
 cat <<EOM
 ===========================================
 WordPress has been successfully installed!
