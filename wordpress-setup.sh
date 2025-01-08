@@ -203,11 +203,11 @@ fi
 #  SSL create a combined certificate and key file and then save it in the .cert format
 log "SSL create a combined certificate and key file and then save it in the .cert format"
 
-sudo certbot certonly --standalone --agree-tos --email admin@${SITE_DOMAIN} -d cockpit.${SITE_DOMAIN}
+#sudo certbot certonly --standalone --agree-tos --email admin@${SITE_DOMAIN} -d cockpit.${SITE_DOMAIN}
 
-sudo cat /etc/letsencrypt/live/cockpit.${SITE_DOMAIN}/fullchain.pem /etc/letsencrypt/live/cockpit.${SITE_DOMAIN}/privkey.pem >/etc/cockpit/ws-certs.d/cockpit.${SITE_DOMAIN}.cert
+#sudo cat /etc/letsencrypt/live/cockpit.${SITE_DOMAIN}/fullchain.pem /etc/letsencrypt/live/cockpit.${SITE_DOMAIN}/privkey.pem >/etc/cockpit/ws-certs.d/cockpit.${SITE_DOMAIN}.cert
 
-sudo systemctl restart cockpit.socket
+#sudo systemctl restart cockpit.socket
 
 
 # Enable automatic SSL certificate renewal
