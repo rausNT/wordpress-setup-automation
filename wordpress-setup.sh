@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Log file for debugging
@@ -228,26 +229,36 @@ fi
 
 # Display final configuration
 log "WordPress installation completed. Displaying configuration details..."
+
 cat <<EOM
 ===========================================
 WordPress has been successfully installed!
 
+Site Details:
+- Website URL: https://${SITE_DOMAIN}
+- Admin setup: https://${SITE_DOMAIN}/wp-admin/setup-config.php
+
 Database connection details:
-  Database name: ${DB_NAME}
-  Username: ${DB_USER}
-  Password: ${DB_PASSWORD}
+- Database Name: ${DB_NAME}
+- Database User: ${DB_USER}
+- Database Password: [hidden for security]
+  (You used this password during the setup.)
 
-Website is accessible at: http://${SITE_DOMAIN}/
+Cockpit (Server Management) Details:
+- URL: https://${SITE_DOMAIN}:9090
+- Username: ${DB_USER}
+- Password: Same as your database password.
 
-SSL certificate installed. Accessible via HTTPS: https://${SITE_DOMAIN}/
+Recommendations:
+1. If the website URL is not working:
+   - Verify your domain's DNS A record is correctly pointed to the server's IP.
+   - Ensure the firewall settings allow HTTP/HTTPS traffic.
 
-Cockpit server management available at: https://${SITE_DOMAIN}:9090/
-  Username: ${DB_USER}
-  Password: ${DB_PASSWORD}
+2. Use the Cockpit interface for easy server management.
 
-Fail2Ban configured to protect against suspicious requests.
-ClamAV installed for antivirus protection.
+3. Remember to regularly monitor your server and update software for security.
+
+Thank you for using this script! Enjoy your new WordPress website.
 ===========================================
 EOM
 
-log "Script execution completed successfully."
