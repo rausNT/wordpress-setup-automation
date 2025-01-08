@@ -235,23 +235,23 @@ WordPress has been successfully installed!
 Database connection details:
   Database Name: ${DB_NAME}
   User: ${DB_USER}
-  Password: (hidden for security)
 
-Website:
-  Main Site: https://${SITE_DOMAIN}
-  Admin Panel: https://${SITE_DOMAIN}/wp-admin/
+  Password: ${DB_PASSWORD}
 
-Server Management:
-  Webmin: https://${SITE_DOMAIN}:10000/
-  Username: root
-  Password: (same as your server root password)
+Access your WordPress site:
+  Main site: https://${SITE_DOMAIN}
+  Admin panel: https://${SITE_DOMAIN}/
+  
+  Webmin interface:
+  https://${SITE_DOMAIN}:10000
+  Username: ${DB_USER}
+  Password: ${DB_PASSWORD}
 
-If you encounter issues with accessing the site, check the following:
-  - Ensure A and CNAME records for ${SITE_DOMAIN} are correctly configured.
-  - Verify that the firewall allows HTTP (port 80) and HTTPS (port 443) traffic.
-  - Review the logs at /var/log/wordpress_setup.log for any errors.
+In case the website or Webmin is inaccessible:
+  - Verify your domain's A records at your DNS provider.
+  - Check if the UFW firewall rules allow necessary ports (80, 443, 10000).
+  - Ensure services like Nginx, PHP-FPM, and Webmin are running.
 
-Enjoy your WordPress site!
+Thank you for using the WordPress setup script!
 ===========================================
 EOM
-
