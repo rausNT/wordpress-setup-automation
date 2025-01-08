@@ -94,7 +94,7 @@ clean_install_prompt
 # Install necessary packages
 log "Installing necessary packages..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx cockpit
+sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx webmin
 
 # Configure MySQL
 log "Configuring MySQL..."
@@ -155,7 +155,7 @@ sudo chmod -R 755 /var/www/wordpress
 # Configure UFW
 log "Configuring UFW firewall..."
 sudo ufw allow 'Nginx Full'
-sudo ufw allow 9090
+sudo ufw allow 10000
 sudo ufw enable
 
 # Configure Fail2Ban for security
@@ -214,51 +214,44 @@ if ! sudo systemctl is-enabled --quiet php8.3-fpm; then
     sudo systemctl enable php8.3-fpm
 fi
 
-# Ensure Cockpit is active
-log "Checking Cockpit status..."
-if ! sudo systemctl is-active --quiet cockpit; then
-    log "Cockpit is not running. Attempting to start..."
-    sudo systemctl start cockpit
+# Ensure Webmin is active
+log "Checking Webmin status..."
+if ! sudo systemctl is-active --quiet webmin; then
+    log "Webmin is not running. Attempting to start..."
+    sudo systemctl start webmin
 fi
 
-if ! sudo systemctl is-enabled --quiet cockpit; then
-    log "Cockpit is not enabled at startup. Enabling..."
-    sudo systemctl enable cockpit
+if ! sudo systemctl is-enabled --quiet webmin; then
+    log "Webmin is not enabled at startup. Enabling..."
+    sudo systemctl enable webmin
 fi
 
 # Display final configuration
 log "WordPress installation completed. Displaying configuration details..."
-
-
 cat <<EOM
 ===========================================
 WordPress has been successfully installed!
 
-Site Details:
-- Website URL: https://${SITE_DOMAIN}
-- Admin setup: https://${SITE_DOMAIN}/wp-admin/setup-config.php
-
 Database connection details:
-- Database Name: ${DB_NAME}
-- Database User: ${DB_USER}
-- Database Password: [hidden for security]
-  (You used this password during the setup.)
+  Database Name: ${DB_NAME}
+  User: ${DB_USER}
+  Password: (hidden for security)
 
-Cockpit (Server Management) Details:
-- URL: https://${SITE_DOMAIN}:9090
-- Username: ${DB_USER}
-- Password: Same as your database password.
+Website:
+  Main Site: https://${SITE_DOMAIN}
+  Admin Panel: https://${SITE_DOMAIN}/wp-admin/
 
-Recommendations:
-1. If the website URL is not working:
-   - Verify your domain's DNS A record is correctly pointed to the server's IP.
-   - Ensure the firewall settings allow HTTP/HTTPS traffic.
+Server Management:
+  Webmin: https://${SITE_DOMAIN}:10000/
+  Username: root
+  Password: (same as your server root password)
 
-2. Use the Cockpit interface for easy server management.
+If you encounter issues with accessing the site, check the following:
+  - Ensure A and CNAME records for ${SITE_DOMAIN} are correctly configured.
+  - Verify that the firewall allows HTTP (port 80) and HTTPS (port 443) traffic.
+  - Review the logs at /var/log/wordpress_setup.log for any errors.
 
-3. Remember to regularly monitor your server and update software for security.
-
-Thank you for using this script! Enjoy your new WordPress website.
+Enjoy your WordPress site!
 ===========================================
 EOM
 
