@@ -94,7 +94,14 @@ clean_install_prompt
 # Install necessary packages
 log "Installing necessary packages..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx webmin
+sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx
+
+# Add Webmin repository and install Webmin
+log "Adding Webmin repository..."
+wget -qO- http://www.webmin.com/jcameron-key.asc | sudo tee /etc/apt/trusted.gpg.d/webmin.asc
+sudo add-apt-repository "deb http://download.webmin.com/download/repository sarge contrib"
+sudo apt update
+sudo apt install -y webmin
 
 # Configure MySQL
 log "Configuring MySQL..."
@@ -220,6 +227,7 @@ if ! sudo systemctl is-active --quiet webmin; then
     log "Webmin is not running. Attempting to start..."
     sudo systemctl start webmin
 fi
+
 
 if ! sudo systemctl is-enabled --quiet webmin; then
     log "Webmin is not enabled at startup. Enabling..."
