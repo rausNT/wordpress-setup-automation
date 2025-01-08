@@ -94,7 +94,7 @@ clean_install_prompt
 # Install necessary packages
 log "Installing necessary packages..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx
+sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx cockpit
 
 # Configure MySQL
 log "Configuring MySQL..."
@@ -155,6 +155,7 @@ sudo chmod -R 755 /var/www/wordpress
 # Configure UFW
 log "Configuring UFW firewall..."
 sudo ufw allow 'Nginx Full'
+sudo ufw allow 9090
 sudo ufw enable
 
 # Configure Fail2Ban for security
@@ -213,14 +214,16 @@ if ! sudo systemctl is-enabled --quiet php8.3-fpm; then
     sudo systemctl enable php8.3-fpm
 fi
 
-# Display final configuration
-log "WordPress installation completed. Displaying configuration details..."
+# Ensure Cockpit is active
+log "Checking Cockpit status..."
+if ! sudo systemctl is-active --quiet cockpit; then
+    log "Cockpit is not running. Attempting to start..."
+    sudo systemctl start cockpit
+fi
 
-# Verify website availability
-log "Verifying website availability..."
-WEBSITE_STATUS="not accessible"
-if curl -Is "https://${SITE_DOMAIN}/" | grep -q "200 OK"; then
-    WEBSITE_STATUS="accessible"
+if ! sudo systemctl is-enabled --quiet cockpit; then
+    log "Cockpit is not enabled at startup. Enabling..."
+    sudo systemctl enable cockpit
 fi
 
 # Display final configuration
@@ -234,23 +237,17 @@ Database connection details:
   Username: ${DB_USER}
   Password: ${DB_PASSWORD}
 
-Website status: ${WEBSITE_STATUS}
-  Accessible at: http://${SITE_DOMAIN}/
-  SSL-secured: https://${SITE_DOMAIN}/
-  
-  To complete the WordPress setup, visit:
-  https://${SITE_DOMAIN}/wp-admin/setup-config.php
+Website is accessible at: http://${SITE_DOMAIN}/
 
-If the website is not accessible, ensure the following:
-1. Verify that the domain ${SITE_DOMAIN} has correct A/AAAA records pointing to your server's IP.
-2. Check that Nginx is running and properly configured.
-3. Confirm the SSL certificate installation in Certbot logs.
-4. Check that your server's firewall allows HTTP/HTTPS traffic.
+SSL certificate installed. Accessible via HTTPS: https://${SITE_DOMAIN}/
+
+Cockpit server management available at: https://${SITE_DOMAIN}:9090/
+  Username: ${DB_USER}
+  Password: ${DB_PASSWORD}
 
 Fail2Ban configured to protect against suspicious requests.
 ClamAV installed for antivirus protection.
 ===========================================
 EOM
-
 
 log "Script execution completed successfully."
