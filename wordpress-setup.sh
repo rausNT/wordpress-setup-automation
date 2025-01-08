@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Log file for debugging
@@ -157,7 +156,9 @@ sudo chmod -R 755 /var/www/wordpress
 log "Configuring UFW firewall..."
 sudo ufw allow 'Nginx Full'
 sudo ufw allow 9090
+sudo ufw allow 80
 sudo ufw enable
+sudo ufw status verbose
 
 # Configure Fail2Ban for security
 log "Configuring Fail2Ban..."
@@ -198,6 +199,16 @@ else
     log "Error installing SSL certificate. Please check Certbot logs."
     exit 1
 fi
+
+#  SSL create a combined certificate and key file and then save it in the .cert format
+log "SSL create a combined certificate and key file and then save it in the .cert format"
+
+sudo certbot certonly --standalone --agree-tos --email admin@${SITE_DOMAIN} -d cockpit.${SITE_DOMAIN}
+
+sudo cat /etc/letsencrypt/live/cockpit.${SITE_DOMAIN}/fullchain.pem /etc/letsencrypt/live/cockpit.${SITE_DOMAIN}/privkey.pem >/etc/cockpit/ws-certs.d/cockpit.${SITE_DOMAIN}.cert
+
+sudo systemctl restart cockpit.socket
+
 
 # Enable automatic SSL certificate renewal
 log "Enabling Certbot timer for automatic SSL renewal..."
