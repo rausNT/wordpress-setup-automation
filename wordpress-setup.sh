@@ -154,19 +154,15 @@ fi
 
 # Configure Webmin to use Let's Encrypt certificates
 log "Configuring Webmin to use Let's Encrypt certificates..."
-WEBMIN_CONFIG="/etc/webmin/miniserv.conf"
-LE_CERT_PATH="/etc/letsencrypt/live/${SITE_DOMAIN}/fullchain.pem"
-LE_KEY_PATH="/etc/letsencrypt/live/${SITE_DOMAIN}/privkey.pem"
-
-if [[ -f "$LE_CERT_PATH" && -f "$LE_KEY_PATH" ]]; then
-    sudo sed -i "s|^ssl=.*|ssl=1|" "$WEBMIN_CONFIG"
-    sudo sed -i "s|^keyfile=.*|keyfile=${LE_KEY_PATH}|" "$WEBMIN_CONFIG"
-    sudo sed -i "s|^certfile=.*|certfile=${LE_CERT_PATH}|" "$WEBMIN_CONFIG"
+if [[ -f /etc/letsencrypt/live/${SITE_DOMAIN}/fullchain.pem && -f /etc/letsencrypt/live/${SITE_DOMAIN}/privkey.pem ]]; then
+    sudo cp /etc/letsencrypt/live/${SITE_DOMAIN}/fullchain.pem /etc/webmin/miniserv.pem
+    sudo cp /etc/letsencrypt/live/${SITE_DOMAIN}/privkey.pem /etc/webmin/miniserv.pem.key
     sudo systemctl restart webmin
-    log "Webmin has been configured to use Let's Encrypt certificates."
+    log "Webmin is now configured to use the SSL certificate."
 else
-    log "Let's Encrypt certificates not found. Webmin will continue using its default SSL settings."
+    log "Error: SSL certificates for ${SITE_DOMAIN} not found. Skipping Webmin SSL configuration."
 fi
+
 
 
 
