@@ -97,11 +97,19 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip unzip wget ufw fail2ban clamav clamav-daemon certbot python3-certbot-nginx
 
 # Add Webmin repository and install Webmin
+#log "Adding Webmin repository..."
+#wget -qO- http://www.webmin.com/jcameron-key.asc | sudo tee /etc/apt/trusted.gpg.d/webmin.asc
+#sudo add-apt-repository "deb http://download.webmin.com/download/repository sarge contrib"
+#sudo apt update
+#sudo apt install -y webmin
+
+# Add Webmin repository and install Webmin
 log "Adding Webmin repository..."
 wget -qO- http://www.webmin.com/jcameron-key.asc | sudo tee /etc/apt/trusted.gpg.d/webmin.asc
-sudo add-apt-repository "deb http://download.webmin.com/download/repository sarge contrib"
-sudo apt update
+echo "deb http://download.webmin.com/download/repository sarge contrib" | sudo tee /etc/apt/sources.list.d/webmin.list > /dev/null
+sudo apt update -y
 sudo apt install -y webmin
+
 
 # Configure MySQL
 log "Configuring MySQL..."
@@ -175,10 +183,17 @@ sudo chown -R www-data:www-data /var/www/wordpress
 sudo chmod -R 755 /var/www/wordpress
 
 # Configure UFW
+#log "Configuring UFW firewall..."
+#sudo ufw allow 'Nginx Full'
+#sudo ufw allow 10000
+#sudo ufw enable
+
+# Configure UFW firewall
 log "Configuring UFW firewall..."
 sudo ufw allow 'Nginx Full'
 sudo ufw allow 10000
-sudo ufw enable
+echo "y" | sudo ufw enable
+
 
 # Configure Fail2Ban for security
 log "Configuring Fail2Ban..."
@@ -267,8 +282,6 @@ Access your WordPress site:
   
   Webmin interface:
   https://${SITE_DOMAIN}:10000
-  Username: ${DB_USER}
-  Password: ${DB_PASSWORD}
 
 In case the website or Webmin is inaccessible:
   - Verify your domain's A records at your DNS provider.
