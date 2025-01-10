@@ -263,6 +263,20 @@ fi
 
 
 # ----------------
+
+log "Installing WP-CLI..."
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+sudo mv wp-cli.phar /usr/local/bin/wp
+
+# Проверка установки
+if ! wp --info >/dev/null 2>&1; then
+    log "WP-CLI installation failed. Please check the installation steps."
+    exit 1
+fi
+log "WP-CLI successfully installed."
+
+
 log "Creating WordPress configuration file..."
 cat <<EOL | sudo tee /var/www/wordpress/wp-config.php
 <?php
