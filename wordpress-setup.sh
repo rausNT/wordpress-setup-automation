@@ -190,6 +190,7 @@ sudo chmod -R 755 /var/www/wordpress
 
 # Configure UFW firewall
 log "Configuring UFW firewall..."
+sudo ufw allow 'OpenSSH'
 sudo ufw allow 'Nginx Full'
 sudo ufw allow 10000
 echo "y" | sudo ufw enable
