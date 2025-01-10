@@ -82,6 +82,7 @@ SITE_DOMAIN=$(read_input "Enter the domain name for the website (e.g., perfectfo
 DB_NAME=$(read_input "Enter the database name for WordPress (default: wordpress_db): " "wordpress_db")
 DB_USER=$(read_input "Enter the database username (default: wordpress_user): " "wordpress_user")
 DB_PASSWORD=$(read_input "Enter the database password: " "")
+WP_ADMIN_EMAIL=$(read_input "Enter the site administrator's email: " "admin@example.com")
 
 if [[ -z "$DB_PASSWORD" ]]; then
     log "Error: Database password cannot be empty. Please try again."
@@ -302,8 +303,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once ABSPATH . 'wp-settings.php';
 EOL
 
+log "Installing WordPress core..."
+if sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" \
+    --title="My WordPress Site" \
+    --admin_user="${DB_USER}" \
+    --admin_password="${DB_PASSWORD}" \
+    --admin_email="${WP_ADMIN_EMAIL}" \
+    --path="/var/www/wordpress"; then
+    log "WordPress core successfully installed."
+else
+    log "Error installing WordPress core. Check WP-CLI logs."
+    exit 1
+fi
+
+log "Verifying WordPress installation..."
+if ! sudo -u www-data wp core is-installed --path="/var/www/wordpress"; then
+    log "Error: WordPress core is not properly installed. Exiting."
+    exit 1
+fi
+
+
+
 log "Installing Kadence theme and setting up WordPress admin..."
-sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" --title="My WordPress Site" --admin_user="${WP_ADMIN}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path="/var/www/wordpress"
+#sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" --title="My WordPress Site" --admin_user="${WP_ADMIN}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path="/var/www/wordpress"
 sudo -u www-data wp theme install kadence --activate --path="/var/www/wordpress"
 
 log "Installing Kadence Starter Templates plugin..."
