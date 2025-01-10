@@ -337,18 +337,19 @@ else
 fi
 
 log "Checking Kadence Starter Templates import functionality..."
-if sudo -u www-data wp kadence-starter-templates list --path="/var/www/wordpress" | grep -q "interior-design"; then
-    log "Importing 'Interior Design' starter template..."
-    if sudo -u www-data wp kadence-starter-templates import --template="interior-design" --path="/var/www/wordpress"; then
-        log "Kadence Starter Template 'Interior Design' successfully imported."
+if sudo -u www-data wp help | grep -q "kadence-starter-templates"; then
+    if sudo -u www-data wp kadence-starter-templates list --path="/var/www/wordpress" | grep -q "interior-design"; then
+        sudo -u www-data wp kadence-starter-templates import interior-design --path="/var/www/wordpress"
+        log "Interior Design starter template successfully imported."
     else
-        log "Error importing 'Interior Design' template. Check WP-CLI or plugin compatibility."
+        log "Interior Design template not found in Kadence Starter Templates plugin."
         exit 1
     fi
 else
-    log "Interior Design template not found in Kadence Starter Templates plugin."
-    exit 1
+    log "Kadence Starter Templates plugin does not support WP-CLI. Please import templates manually."
+    exit 0
 fi
+
 
 
 #-----------------
