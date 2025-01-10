@@ -182,11 +182,7 @@ sudo unzip /tmp/wordpress.zip -d /var/www/
 sudo chown -R www-data:www-data /var/www/wordpress
 sudo chmod -R 755 /var/www/wordpress
 
-# Configure UFW
-#log "Configuring UFW firewall..."
-#sudo ufw allow 'Nginx Full'
-#sudo ufw allow 10000
-#sudo ufw enable
+
 
 # Configure UFW firewall
 log "Configuring UFW firewall..."
@@ -265,6 +261,62 @@ if ! sudo systemctl is-enabled --quiet webmin; then
     sudo systemctl enable webmin
 fi
 
+
+# ----------------
+log "Creating WordPress configuration file..."
+cat <<EOL | sudo tee /var/www/wordpress/wp-config.php
+<?php
+define( 'DB_NAME', '${DB_NAME}' );
+define( 'DB_USER', '${DB_USER}' );
+define( 'DB_PASSWORD', '${DB_PASSWORD}' );
+define( 'DB_HOST', 'localhost' );
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATE', '' );
+define( 'AUTH_KEY',         '$(openssl rand -base64 32)' );
+define( 'SECURE_AUTH_KEY',  '$(openssl rand -base64 32)' );
+define( 'LOGGED_IN_KEY',    '$(openssl rand -base64 32)' );
+define( 'NONCE_KEY',        '$(openssl rand -base64 32)' );
+define( 'AUTH_SALT',        '$(openssl rand -base64 32)' );
+define( 'SECURE_AUTH_SALT', '$(openssl rand -base64 32)' );
+define( 'LOGGED_IN_SALT',   '$(openssl rand -base64 32)' );
+define( 'NONCE_SALT',       '$(openssl rand -base64 32)' );
+\$table_prefix = 'wp_';
+define( 'WP_DEBUG', false );
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+require_once ABSPATH . 'wp-settings.php';
+EOL
+
+log "Installing Kadence theme and setting up WordPress admin..."
+sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" --title="My WordPress Site" --admin_user="${WP_ADMIN}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path="/var/www/wordpress"
+sudo -u www-data wp theme install kadence --activate --path="/var/www/wordpress"
+
+log "Installing Kadence Starter Templates plugin..."
+if sudo -u www-data wp plugin install kadence-starter-templates --activate --path="/var/www/wordpress"; then
+    log "Kadence Starter Templates plugin successfully installed."
+else
+    log "Error installing Kadence Starter Templates plugin. Check WP-CLI logs."
+    exit 1
+fi
+
+log "Checking Kadence Starter Templates import functionality..."
+if sudo -u www-data wp kadence-starter-templates list --path="/var/www/wordpress" | grep -q "interior-design"; then
+    log "Importing 'Interior Design' starter template..."
+    if sudo -u www-data wp kadence-starter-templates import --template="interior-design" --path="/var/www/wordpress"; then
+        log "Kadence Starter Template 'Interior Design' successfully imported."
+    else
+        log "Error importing 'Interior Design' template. Check WP-CLI or plugin compatibility."
+        exit 1
+    fi
+else
+    log "Interior Design template not found in Kadence Starter Templates plugin."
+    exit 1
+fi
+
+
+#-----------------
+
 # Display final configuration
 log "WordPress installation completed. Displaying configuration details..."
 cat <<EOM
@@ -279,7 +331,7 @@ Database connection details:
 
 Access your WordPress site:
   Main site: https://${SITE_DOMAIN}
-  Admin panel: https://${SITE_DOMAIN}/
+  Admin Panel: https://${SITE_DOMAIN}/wp-admin
   
   Webmin interface:
   https://${SITE_DOMAIN}:10000
