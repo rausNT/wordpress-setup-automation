@@ -24,7 +24,7 @@ bash -x <(curl -Ls https://raw.githubusercontent.com/rausNT/wordpress-setup-auto
 ```
 This will provide step-by-step output of each command being executed, helping you identify where the issue might be.
 
-##Adding a New WordPress Site
+## Adding a New WordPress Site
 To add a new WordPress site to the same server without overwriting existing ones, use the following command:
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/rausNT/wordpress-setup-automation/main/add-new-wordpress-site.sh)
