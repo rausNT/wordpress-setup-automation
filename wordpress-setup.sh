@@ -303,6 +303,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once ABSPATH . 'wp-settings.php';
 EOL
 
+sudo mkdir -p /var/www/.wp-cli/cache/
+sudo chown -R www-data:www-data /var/www/.wp-cli/
+sudo chmod -R 755 /var/www/.wp-cli/
+
+
 log "Installing WordPress core..."
 if sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" \
     --title="My WordPress Site" \
