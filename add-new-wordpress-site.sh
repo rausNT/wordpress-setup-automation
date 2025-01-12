@@ -17,6 +17,18 @@ read_input() {
     echo "${input:-$default_value}"
 }
 
+# Ensure WP-CLI is installed
+log "Checking for WP-CLI..."
+if ! command -v wp &> /dev/null; then
+    log "WP-CLI not found. Installing WP-CLI..."
+    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x wp-cli.phar
+    sudo mv wp-cli.phar /usr/local/bin/wp
+    log "WP-CLI installed successfully."
+else
+    log "WP-CLI is already installed."
+fi
+
 # Collecting user input
 SITE_DOMAIN=$(read_input "Enter the domain name for the new website (e.g., example.com): " "example.com")
 DB_NAME=$(read_input "Enter the database name for the new WordPress site (default: wordpress_new): " "wordpress_new")
@@ -56,14 +68,14 @@ server {
         try_files \$uri \$uri/ /index.php?\$args;
     }
 
-    location ~ \\.php$ {
+    location ~ \.php$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         include fastcgi_params;
     }
 
-    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires max;
         log_not_found off;
     }
