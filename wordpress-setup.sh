@@ -329,31 +329,31 @@ fi
 
 
 
-log "Installing Kadence theme and setting up WordPress admin..."
-#sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" --title="My WordPress Site" --admin_user="${WP_ADMIN}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path="/var/www/wordpress"
-sudo -u www-data wp theme install kadence --activate --path="/var/www/wordpress"
+# log "Installing Kadence theme and setting up WordPress admin..."
 
-log "Installing Kadence Starter Templates plugin..."
-if sudo -u www-data wp plugin install kadence-starter-templates --activate --path="/var/www/wordpress"; then
-    log "Kadence Starter Templates plugin successfully installed."
-else
-    log "Error installing Kadence Starter Templates plugin. Check WP-CLI logs."
-    exit 1
-fi
+# sudo -u www-data wp theme install kadence --activate --path="/var/www/wordpress"
 
-log "Checking Kadence Starter Templates import functionality..."
-if sudo -u www-data wp help | grep -q "kadence-starter-templates"; then
-    if sudo -u www-data wp kadence-starter-templates list --path="/var/www/wordpress" | grep -q "interior-design"; then
-        sudo -u www-data wp kadence-starter-templates import interior-design --path="/var/www/wordpress"
-        log "Interior Design starter template successfully imported."
-    else
-        log "Interior Design template not found in Kadence Starter Templates plugin."
-        exit 1
-    fi
-else
-    log "Kadence Starter Templates plugin does not support WP-CLI. Please import templates manually."
-    exit 0
-fi
+# log "Installing Kadence Starter Templates plugin..."
+# if sudo -u www-data wp plugin install kadence-starter-templates --activate --path="/var/www/wordpress"; then
+  #   log "Kadence Starter Templates plugin successfully installed."
+# else
+  #   log "Error installing Kadence Starter Templates plugin. Check WP-CLI logs."
+   #  exit 1
+# fi
+
+# log "Checking Kadence Starter Templates import functionality..."
+# if sudo -u www-data wp help | grep -q "kadence-starter-templates"; then
+  #   if sudo -u www-data wp kadence-starter-templates list --path="/var/www/wordpress" | grep -q "interior-design"; then
+    #     sudo -u www-data wp kadence-starter-templates import interior-design --path="/var/www/wordpress"
+      #   log "Interior Design starter template successfully imported."
+    # else
+      #   log "Interior Design template not found in Kadence Starter Templates plugin."
+      #   exit 1
+   #  fi
+# else
+  #   log "Kadence Starter Templates plugin does not support WP-CLI. Please import templates manually."
+   #  exit 0
+# fi
 
 
 
