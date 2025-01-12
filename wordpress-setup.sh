@@ -265,67 +265,67 @@ fi
 
 # ----------------
 
-log "Installing WP-CLI..."
-curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-chmod +x wp-cli.phar
-sudo mv wp-cli.phar /usr/local/bin/wp
+# log "Installing WP-CLI..."
+#curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+#chmod +x wp-cli.phar
+#sudo mv wp-cli.phar /usr/local/bin/wp
 
 # Проверка установки
-if ! wp --info >/dev/null 2>&1; then
-    log "WP-CLI installation failed. Please check the installation steps."
-    exit 1
-fi
-log "WP-CLI successfully installed."
+#if ! wp --info >/dev/null 2>&1; then
+ #   log "WP-CLI installation failed. Please check the installation steps."
+  #  exit 1
+#fi
+# log "WP-CLI successfully installed."
 
 
-log "Creating WordPress configuration file..."
-cat <<EOL | sudo tee /var/www/wordpress/wp-config.php
-<?php
-define( 'DB_NAME', '${DB_NAME}' );
-define( 'DB_USER', '${DB_USER}' );
-define( 'DB_PASSWORD', '${DB_PASSWORD}' );
-define( 'DB_HOST', 'localhost' );
-define( 'DB_CHARSET', 'utf8' );
-define( 'DB_COLLATE', '' );
-define( 'AUTH_KEY',         '$(openssl rand -base64 32)' );
-define( 'SECURE_AUTH_KEY',  '$(openssl rand -base64 32)' );
-define( 'LOGGED_IN_KEY',    '$(openssl rand -base64 32)' );
-define( 'NONCE_KEY',        '$(openssl rand -base64 32)' );
-define( 'AUTH_SALT',        '$(openssl rand -base64 32)' );
-define( 'SECURE_AUTH_SALT', '$(openssl rand -base64 32)' );
-define( 'LOGGED_IN_SALT',   '$(openssl rand -base64 32)' );
-define( 'NONCE_SALT',       '$(openssl rand -base64 32)' );
-\$table_prefix = 'wp_';
-define( 'WP_DEBUG', false );
-if ( ! defined( 'ABSPATH' ) ) {
-    define( 'ABSPATH', __DIR__ . '/' );
-}
-require_once ABSPATH . 'wp-settings.php';
-EOL
+#log "Creating WordPress configuration file..."
+#cat <<EOL | sudo tee /var/www/wordpress/wp-config.php
+#<?php
+#define( 'DB_NAME', '${DB_NAME}' );
+#define( 'DB_USER', '${DB_USER}' );
+#define( 'DB_PASSWORD', '${DB_PASSWORD}' );
+#define( 'DB_HOST', 'localhost' );
+#define( 'DB_CHARSET', 'utf8' );
+#define( 'DB_COLLATE', '' );
+#define( 'AUTH_KEY',         '$(openssl rand -base64 32)' );
+#define( 'SECURE_AUTH_KEY',  '$(openssl rand -base64 32)' );
+#define( 'LOGGED_IN_KEY',    '$(openssl rand -base64 32)' );
+#define( 'NONCE_KEY',        '$(openssl rand -base64 32)' );
+#define( 'AUTH_SALT',        '$(openssl rand -base64 32)' );
+#define( 'SECURE_AUTH_SALT', '$(openssl rand -base64 32)' );
+#define( 'LOGGED_IN_SALT',   '$(openssl rand -base64 32)' );
+#define( 'NONCE_SALT',       '$(openssl rand -base64 32)' );
+#\$table_prefix = 'wp_';
+#define( 'WP_DEBUG', false );
+#if ( ! defined( 'ABSPATH' ) ) {
+ #   define( 'ABSPATH', __DIR__ . '/' );
+#}
+#require_once ABSPATH . 'wp-settings.php';
+#EOL
 
-sudo mkdir -p /var/www/.wp-cli/cache/
-sudo chown -R www-data:www-data /var/www/.wp-cli/
-sudo chmod -R 755 /var/www/.wp-cli/
+# sudo mkdir -p /var/www/.wp-cli/cache/
+# sudo chown -R www-data:www-data /var/www/.wp-cli/
+# sudo chmod -R 755 /var/www/.wp-cli/
 
 
-log "Installing WordPress core..."
-if sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" \
-    --title="My WordPress Site" \
-    --admin_user="${DB_USER}" \
-    --admin_password="${DB_PASSWORD}" \
-    --admin_email="${WP_ADMIN_EMAIL}" \
-    --path="/var/www/wordpress"; then
-    log "WordPress core successfully installed."
-else
-    log "Error installing WordPress core. Check WP-CLI logs."
-    exit 1
-fi
+# log "Installing WordPress core..."
+# if sudo -u www-data wp core install --url="https://${SITE_DOMAIN}" \
+  #   --title="My WordPress Site" \
+    # --admin_user="${DB_USER}" \
+   #  --admin_password="${DB_PASSWORD}" \
+   #  --admin_email="${WP_ADMIN_EMAIL}" \
+   #  --path="/var/www/wordpress"; then
+   #  log "WordPress core successfully installed."
+# else
+  #   log "Error installing WordPress core. Check WP-CLI logs."
+   #  exit 1
+   # fi
 
-log "Verifying WordPress installation..."
-if ! sudo -u www-data wp core is-installed --path="/var/www/wordpress"; then
-    log "Error: WordPress core is not properly installed. Exiting."
-    exit 1
-fi
+# log "Verifying WordPress installation..."
+# if ! sudo -u www-data wp core is-installed --path="/var/www/wordpress"; then
+ #    log "Error: WordPress core is not properly installed. Exiting."
+   #  exit 1
+# fi
 
 
 
