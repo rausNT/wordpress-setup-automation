@@ -17,6 +17,16 @@ read_input() {
     echo "${input:-$default_value}"
 }
 
+# Function to detect non-ASCII domain names and convert to Punycode
+is_cyrillic_domain() {
+    local domain="$1"
+    if [[ "$domain" =~ [^a-zA-Z0-9.-] ]]; then
+        return 0  # True: domain contains non-ASCII characters
+    else
+        return 1  # False: domain is ASCII
+    fi
+}
+
 # Ensure WP-CLI is installed
 log "Checking for WP-CLI..."
 if ! command -v wp &> /dev/null; then
@@ -31,6 +41,20 @@ fi
 
 # Collecting user input
 SITE_DOMAIN=$(read_input "Enter the domain name for the new website (e.g., example.com): " "example.com")
+
+# Check if domain is Cyrillic and convert to Punycode if necessary
+if is_cyrillic_domain "$SITE_DOMAIN"; then
+    if ! command -v idn2 &> /dev/null; then
+        log "idn2 utility is not installed. Installing..."
+        sudo apt install -y idn2
+    fi
+    SITE_DOMAIN_PUNYCODE=$(idn2 "$SITE_DOMAIN")
+    log "Detected non-ASCII domain. Converted to Punycode: $SITE_DOMAIN_PUNYCODE"
+else
+    SITE_DOMAIN_PUNYCODE="$SITE_DOMAIN"
+    log "Detected ASCII domain. Using as-is: $SITE_DOMAIN"
+fi
+
 DB_NAME=$(read_input "Enter the database name for the new WordPress site (default: wordpress_new): " "wordpress_new")
 DB_USER=$(read_input "Enter the database username for the new site (default: wp_user_new): " "wp_user_new")
 DB_PASSWORD=$(read_input "Enter the database password for the new site: " "")
@@ -56,10 +80,10 @@ sudo chmod -R 755 "$SITE_DIR"
 
 # Configure Nginx for the new site
 log "Configuring Nginx for the new site..."
-cat <<EOL | sudo tee /etc/nginx/sites-available/${SITE_DOMAIN}
+cat <<EOL | sudo tee /etc/nginx/sites-available/${SITE_DOMAIN_PUNYCODE}
 server {
     listen 80;
-    server_name ${SITE_DOMAIN};
+    server_name ${SITE_DOMAIN_PUNYCODE};
 
     root ${SITE_DIR};
     index index.php index.html index.htm;
@@ -82,7 +106,7 @@ server {
 }
 EOL
 
-sudo ln -s /etc/nginx/sites-available/${SITE_DOMAIN} /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/${SITE_DOMAIN_PUNYCODE} /etc/nginx/sites-enabled/
 
 log "Testing Nginx configuration..."
 if sudo nginx -t; then
@@ -134,7 +158,7 @@ fi
 
 # Install SSL certificate
 log "Installing SSL certificate for ${SITE_DOMAIN}..."
-if sudo certbot --nginx -d ${SITE_DOMAIN} -n --agree-tos --email ${WP_ADMIN_EMAIL}; then
+if sudo certbot --nginx -d ${SITE_DOMAIN_PUNYCODE} -n --agree-tos --email ${WP_ADMIN_EMAIL}; then
     log "SSL certificate installed successfully for ${SITE_DOMAIN}."
 else
     log "Error installing SSL certificate for ${SITE_DOMAIN}. Check Certbot logs."
@@ -156,3 +180,4 @@ Database:
 SSL certificate applied successfully.
 ===========================================
 EOM
+
